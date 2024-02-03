@@ -2,71 +2,109 @@
 	import '@unocss/reset/tailwind-compat.css';
 	import 'virtual:uno.css';
 
-	import { cubicOut, backIn } from 'svelte/easing';
-	import { fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
-	import { sentences } from '$lib';
+	import { sentences } from '$lib/data';
+	import { fade } from 'svelte/transition';
+	let clauses = sentences.flat();
 
-	let SNOW_ICONS = sentences.flat();
+	function rangeRandom(min: number, max: number) {
+		return Math.random() * (max - min) + min;
+	}
 
-	const SNOWFLAKES_COUNT = 500;
-	const SNOWFLAKE_MIN_SCALE = 0.8;
-	const MAX_FALL_DURATION = 10000;
-	const MELTING_WAIT = 3000;
-	const MELTING_DURATION = 8000;
-	const WIND_FORCE = 0.1;
+	function lerp(start: number, end: number, t: number) {
+		return start * (1 - t) + end * t;
+	}
 
-	const MAX_TOTAL_TIME = MAX_FALL_DURATION + MELTING_WAIT + MELTING_DURATION;
+	////////////////////////////////////////////////////////////
+	// PARAMETERS
+	const SNOWFLAKE_HEIGHT_EM = 12;
 
-	function randomSnowflakeConfig(i: number) {
-		const scale = SNOWFLAKE_MIN_SCALE + Math.random() * (1 - SNOWFLAKE_MIN_SCALE);
-		const xStart = Math.random() * (1 + WIND_FORCE) - WIND_FORCE;
+	const MIN_IN_DURATION = 2000;
+	const MAX_IN_DURATION = 100000;
+
+	const MIN_OUT_DURATION = 500;
+	const MAX_OUT_DURATION = 3000;
+
+	///////////////////////////////////////////////////////////
+
+	// Font size relative to the fall duration, to give the impression of "depth"
+	const MIN_FONTSIZE = 12;
+	const MAX_FONTSIZE = 48;
+	const FONT_SIZE_NOISE_RANGE = 3;
+	function interpolateFontSize(inDuration: number) {
+		const t = (inDuration - MIN_IN_DURATION) / (MAX_IN_DURATION - MIN_IN_DURATION);
+		const value = lerp(MAX_FONTSIZE, MIN_FONTSIZE, t);
+		const fontSize = value + rangeRandom(-FONT_SIZE_NOISE_RANGE, FONT_SIZE_NOISE_RANGE);
+		return fontSize;
+	}
+
+	////////////////////////////////////////////////////////////
+	// Snowflake data
+	// Create all at the beginning
+
+	type Snowflake = {
+		visible: boolean;
+		xCoord: number; // [0, 1]
+		text: string;
+		inDuration: number;
+		fontSize: number;
+	};
+
+	function createSnowflake(): Snowflake {
+		const text = clauses[Math.floor(Math.random() * clauses.length)]; // TODO: to `sentence`
+		const xCoord = Math.random();
+		const inDuration = rangeRandom(MIN_IN_DURATION, MAX_IN_DURATION);
+		const fontSize = interpolateFontSize(inDuration);
 		return {
 			visible: false,
-			scale,
-			inDelay: Math.random() * MAX_TOTAL_TIME,
-			inDuration: (1 + SNOWFLAKE_MIN_SCALE - scale) * MAX_FALL_DURATION,
-			xStart,
-			xEnd: xStart + scale * WIND_FORCE,
-			snowIcon: SNOW_ICONS[i % SNOW_ICONS.length]
+			text,
+			xCoord,
+			inDuration,
+			fontSize
 		};
 	}
 
-	let snowflakes = new Array(SNOWFLAKES_COUNT)
-		.fill()
-		.map((_, i) => randomSnowflakeConfig(i))
-		.sort((a, b) => a.scale - b.scale);
+	// Sort by duration, so the faster (and bigger) ones are on top
+	let snowflakes: Snowflake[] = Array.from({ length: 20 }, createSnowflake).sort(
+		(a, b) => b.inDuration - a.inDuration
+	);
 
-	// Svelte custom transition
-	function fall(
+	////////////////////////////////////////////////////////////
+	// IN transition
+
+	function inTransition(
 		_node: HTMLElement,
-		{ delay = 0, duration = 1000, xStart = 0.1, xEnd = 0.5, scale = 1.0 }
+		{ xCoord, inDuration, fontSize }: { xCoord: number; inDuration: number; fontSize: number }
 	) {
-		return {
-			duration,
-			delay,
-			css: (t: number) => {
-				const x_t = backIn(t);
-				const y_t = t;
+		const delay = 0; // TODO: randomize
 
-				const x_coord = (xEnd - xStart) * x_t + xStart;
+		return {
+			delay,
+			duration: inDuration,
+			css: (t: number) => {
 				return `
-          transform: scale(${scale}) rotate(${x_t * 90}deg);
-          left: ${x_coord * 100}%;
-          bottom: ${100 - y_t * 100}%;
-        `;
+					left: ${xCoord * 100}%;
+					bottom: ${100 - t * 100}%;
+					font-size: ${fontSize}px;
+		        `;
 			}
 		};
 	}
 
-	// start everything on mount. starting means setting the snowflakes visible.
-	// this "hack" is not needed when you configure your svelte to display transitions on first render:
-	// https://svelte.dev/docs#Client-side_component_API - set `intro: true`
+	////////////////////////////////////////////////////////////
+	// OUT transition
+
 	onMount(async () => {
+		// start everything on mount. starting means setting the snowflakes visible.
+		// this "hack" is not needed when you configure your svelte to display transitions on first render:
+		// https://svelte.dev/docs#Client-side_component_API - set `intro: true`
 		setTimeout(() => {
 			snowflakes = snowflakes.map((sf) => ({ ...sf, visible: true }));
 		}, 50);
+
+		// CSS custom properties
+		document.documentElement.style.setProperty('--snowflake-height', `${SNOWFLAKE_HEIGHT_EM}em`);
 	});
 </script>
 
@@ -74,24 +112,18 @@
 	<title>おもいでふりつもる - ななめせんなめせん</title>
 </svelte:head>
 
-<div class="snowframe" aria-hidden="true">
-	{#each snowflakes as flake}
-		{#if flake.visible}
+<div id="snowflake-wrapper">
+	{#each snowflakes as sf}
+		{#if sf.visible}
 			<div
 				class="snowflake"
-				style={`transform: scale(${flake.scale}); left: ${flake.xEnd * 100}%`}
-				in:fall={{
-					delay: flake.inDelay,
-					duration: flake.inDuration,
-					scale: flake.scale,
-					xStart: flake.xStart,
-					xEnd: flake.xEnd
-				}}
-				out:fade={{ delay: MELTING_WAIT, duration: MELTING_DURATION, easing: cubicOut }}
-				on:introend={() => (flake.visible = false)}
-				on:outroend={() => (flake.visible = true)}
+				style="left: {sf.xCoord * 100}%; bottom: 0; font-size: {sf.fontSize}px;"
+				in:inTransition={{ xCoord: sf.xCoord, inDuration: sf.inDuration, fontSize: sf.fontSize }}
+				on:introend={() => (sf.visible = false)}
+				out:fade={{ delay: 0, duration: rangeRandom(MIN_OUT_DURATION, MAX_OUT_DURATION) }}
+				on:outroend={() => (sf.visible = true)}
 			>
-				{flake.snowIcon}
+				{sf.text}
 			</div>
 		{/if}
 	{/each}
@@ -100,8 +132,8 @@
 <style>
 	:global(body) {
 		min-height: 100%;
-		@apply text-gray-900;
 		@apply bg-white;
+		@apply text-black;
 		writing-mode: vertical-rl;
 	}
 
@@ -109,22 +141,17 @@
 		height: 100%;
 	}
 
-	.snowframe {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+	#snowflake-wrapper {
+		/* position: relative; */
+		height: 100%;
 		overflow: hidden;
 	}
 
 	.snowflake {
-		font-size: 1.2rem;
-		line-height: 1.2rem;
-		color: black;
-		text-shadow: 0 0 5px #888;
 		position: absolute;
 		z-index: 1000;
 		overflow: hidden;
+		height: var(--snowflake-height);
+		text-align: end;
 	}
 </style>
