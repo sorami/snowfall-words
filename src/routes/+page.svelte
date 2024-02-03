@@ -6,22 +6,13 @@
 	import { fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
+	import { sentences } from '$lib';
+
 	/*
 	Based on this awesome example: https://mannes.tech/svelte-snowfall/
 	*/
 
-	let SNOW_ICONS = [
-		'雪は楽しい',
-		'雪かきが大変',
-		'寒い',
-		'音が吸収されて静か',
-		'滑って転ぶ',
-		'スキー楽しい',
-		'反射して眩しい',
-		'車の運転が怖い',
-		'自動車のタイヤ交換が必要',
-		'観光資源'
-	];
+	let SNOW_ICONS = sentences.flat();
 
 	const SNOWFLAKES_COUNT = 500;
 	const SNOWFLAKE_MIN_SCALE = 0.8;
