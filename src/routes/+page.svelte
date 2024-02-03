@@ -8,10 +8,6 @@
 
 	import { sentences } from '$lib';
 
-	/*
-	Based on this awesome example: https://mannes.tech/svelte-snowfall/
-	*/
-
 	let SNOW_ICONS = sentences.flat();
 
 	const SNOWFLAKES_COUNT = 500;
@@ -19,7 +15,7 @@
 	const MAX_FALL_DURATION = 10000;
 	const MELTING_WAIT = 3000;
 	const MELTING_DURATION = 8000;
-	const WIND_FORCE = 0.8;
+	const WIND_FORCE = 0.1;
 
 	const MAX_TOTAL_TIME = MAX_FALL_DURATION + MELTING_WAIT + MELTING_DURATION;
 
@@ -75,7 +71,7 @@
 </script>
 
 <svelte:head>
-	<title>Snowfall Words</title>
+	<title>おもいでふりつもる - ななめせんなめせん</title>
 </svelte:head>
 
 <div class="snowframe" aria-hidden="true">
@@ -123,11 +119,10 @@
 	}
 
 	.snowflake {
-		color: black;
 		font-size: 1.2rem;
 		line-height: 1.2rem;
-		font-family: Arial, sans-serif;
-		text-shadow: 0 0 5px #000;
+		color: black;
+		text-shadow: 0 0 5px #888;
 		position: absolute;
 		z-index: 1000;
 		overflow: hidden;
