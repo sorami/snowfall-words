@@ -4,6 +4,9 @@
 
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { bounceInOut, backInOut } from 'svelte/easing';
+	import { rangeRandom } from '$lib/utils';
+
 	import {
 		N_SNOWFLAKES,
 		SNOWFLAKE_HEIGHT_EM,
@@ -23,18 +26,26 @@
 		text: string;
 		inDuration: number;
 		fontSize: number;
+		easingParams: Record<string, number>;
 	};
 	function createSnowflake(): Snowflake {
-		const text = clauses[Math.floor(Math.random() * clauses.length)]; // TODO: to `sentence`
+		const text = clauses[Math.floor(Math.random() * clauses.length)]; // TODO: use `sentence`
 		const xCoord = Math.random();
 		const inDuration = randomInDuration();
 		const fontSize = interpolateFontSize(inDuration);
+
+		// TODO: to `params.ts`
+		const easingParams = {
+			x: Math.random() > 0.5 ? rangeRandom(10, 30) : rangeRandom(-30, -10),
+			deg: rangeRandom(-20, 20)
+		};
 		return {
 			visible: false,
 			text,
 			xCoord,
 			inDuration,
-			fontSize
+			fontSize,
+			easingParams
 		};
 	}
 	let snowflakes: Snowflake[] = Array.from({ length: N_SNOWFLAKES }, createSnowflake).sort(
@@ -44,7 +55,17 @@
 
 	function inTransition(
 		_node: HTMLElement,
-		{ xCoord, inDuration, fontSize }: { xCoord: number; inDuration: number; fontSize: number }
+		{
+			xCoord,
+			inDuration,
+			fontSize,
+			easingParams
+		}: {
+			xCoord: number;
+			inDuration: number;
+			fontSize: number;
+			easingParams: Record<string, number>;
+		}
 	) {
 		// Random everytime, so the looped transitions don't look the same
 		const delay = randomInDelay();
@@ -53,10 +74,14 @@
 			delay,
 			duration: inDuration,
 			css: (t: number) => {
+				const xt = backInOut(1 - t) / easingParams.x;
+				const deg = (1 - t) * easingParams.deg;
+
 				return `
-					left: ${xCoord * 100}%;
-					bottom: ${100 - t * 100}%;
+					left: ${(xCoord + xt) * 100}%;
 					font-size: ${fontSize}px;
+					bottom: ${100 - t * 100}%;
+					transform: rotate(${deg}deg);
 		        `;
 			}
 		};
@@ -87,7 +112,12 @@
 			<div
 				class="snowflake"
 				style="left: {sf.xCoord * 100}%; bottom: 0; font-size: {sf.fontSize}px;"
-				in:inTransition={{ xCoord: sf.xCoord, inDuration: sf.inDuration, fontSize: sf.fontSize }}
+				in:inTransition={{
+					xCoord: sf.xCoord,
+					inDuration: sf.inDuration,
+					fontSize: sf.fontSize,
+					easingParams: sf.easingParams
+				}}
 				on:introend={() => (sf.visible = false)}
 				out:fade={{ delay: 0, duration: randomOutDuration() }}
 				on:outroend={() => (sf.visible = true)}

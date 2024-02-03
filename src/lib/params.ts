@@ -8,8 +8,8 @@ export function randomInDelay() {
 	return rangeRandom(0, MAX_IN_DELAY);
 }
 
-const MIN_IN_DURATION = 2000;
-const MAX_IN_DURATION = 10000;
+const MIN_IN_DURATION = 5000;
+const MAX_IN_DURATION = 20000;
 export function randomInDuration() {
 	return rangeRandom(MIN_IN_DURATION, MAX_IN_DURATION);
 }
