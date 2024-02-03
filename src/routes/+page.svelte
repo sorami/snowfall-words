@@ -6,7 +6,7 @@
 	import { fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
-	/* 
+	/*
 	Based on this awesome example: https://mannes.tech/svelte-snowfall/
 	*/
 
@@ -24,11 +24,11 @@
 	];
 
 	const SNOWFLAKES_COUNT = 500;
-	const SNOWFLAKE_MIN_SCALE = 0.4;
+	const SNOWFLAKE_MIN_SCALE = 0.8;
 	const MAX_FALL_DURATION = 10000;
 	const MELTING_WAIT = 3000;
 	const MELTING_DURATION = 8000;
-	const WIND_FORCE = 0.2;
+	const WIND_FORCE = 0.8;
 
 	const MAX_TOTAL_TIME = MAX_FALL_DURATION + MELTING_WAIT + MELTING_DURATION;
 
@@ -65,7 +65,7 @@
 
 				const x_coord = (xEnd - xStart) * x_t + xStart;
 				return `
-          transform: scale(${scale}) rotate(${x_t * 720}deg);
+          transform: scale(${scale}) rotate(${x_t * 90}deg);
           left: ${x_coord * 100}%;
           bottom: ${100 - y_t * 100}%;
         `;
@@ -113,7 +113,9 @@
 <style>
 	:global(body) {
 		min-height: 100%;
-		@apply bg-gray-900;
+		@apply text-gray-900;
+		@apply bg-white;
+		writing-mode: vertical-rl;
 	}
 
 	:global(html) {
@@ -130,7 +132,7 @@
 	}
 
 	.snowflake {
-		color: #fff;
+		color: black;
 		font-size: 1.2rem;
 		line-height: 1.2rem;
 		font-family: Arial, sans-serif;
