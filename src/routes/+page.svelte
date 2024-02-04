@@ -19,32 +19,32 @@
 		in: {
 			minDuration: 5000,
 			maxDuration: 20000,
-			inDelayOffsetMax: 200000
+			inDelayOffsetMax: 180000
 		},
 		out: {
-			minDuration: 500,
-			maxDuration: 3000,
-			minOutroendDelay: 100000,
-			maxOutroendDelay: 200000
+			minDuration: 2000,
+			maxDuration: 6000,
+			minOutroendDelay: 60000,
+			maxOutroendDelay: 120000
 		},
 		font: {
-			min: 9,
-			max: 48,
-			noise: 3
+			min: 8,
+			max: 40,
+			noise: 0
 		},
 		css: {
 			snowflakeHeight: {
 				name: '--snowflake-height',
-				value: 9,
+				value: 8,
 				unit: 'em'
 			}
 		},
 		easing: {
 			x: {
-				min: 25,
+				min: 10,
 				max: 50
 			},
-			deg: 20
+			deg: 30
 		}
 	};
 
@@ -207,6 +207,8 @@
 		writing-mode: vertical-rl;
 		text-align: end;
 		line-height: 1.1em;
+		text-shadow: 0px 0px 10px rgba(0, 0, 64, 0.3);
+		@apply font-bold;
 		@apply font-sans;
 	}
 </style>

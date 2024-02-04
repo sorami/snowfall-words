@@ -11,7 +11,7 @@
 			<h2 class="text-center font-bold text-sm">パラメーター</h2>
 
 			<div class="flex flex-col gap-3">
-				<Slider label="文数" bind:value={params.nSentences} min={1} max={100} />
+				<Slider label="文数" bind:value={params.nSentences} min={1} max={200} />
 
 				<Slider label="1行文字数" bind:value={params.css.snowflakeHeight.value} min={5} max={30} />
 
@@ -52,11 +52,11 @@
 				</div>
 
 				<div class=" flex flex-col gap-1">
-					<h3 class="font-bold text-xs">最初に登場するまでの遅延</h3>
-					<Slider label="min" bind:value={params.in.inDelayOffsetMax} min={3000} max={50000} />
+					<h3 class="font-bold text-xs">最初に登場するまでの遅延時間</h3>
+					<Slider label="max" bind:value={params.in.inDelayOffsetMax} min={60000} max={360000} />
 				</div>
 				<div class=" flex flex-col gap-1">
-					<h3 class="font-bold text-xs">再び登場するまでの遅延</h3>
+					<h3 class="font-bold text-xs">再び登場するまでの遅延時間</h3>
 					<Slider label="min" bind:value={params.out.minOutroendDelay} min={10000} max={500000} />
 					<Slider label="max" bind:value={params.out.maxOutroendDelay} min={10000} max={500000} />
 				</div>
