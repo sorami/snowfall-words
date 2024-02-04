@@ -6,7 +6,7 @@
 	import { fade } from 'svelte/transition';
 	import { backInOut } from 'svelte/easing';
 	import { rangeRandom } from '$lib/utils';
-
+	import Controller from './controller.svelte';
 	import {
 		N_SNOWFLAKES,
 		SNOWFLAKE_HEIGHT_EM,
@@ -15,6 +15,8 @@
 		randomOutDuration,
 		interpolateFontSize
 	} from '$lib/params';
+
+	let isControllerVisible = false;
 
 	import { sentences } from '$lib/data';
 	let clauses = sentences.flat();
@@ -106,6 +108,7 @@
 	<title>おもいでふりつもる - ななめせんなめせん</title>
 </svelte:head>
 
+<Controller bind:isVisible={isControllerVisible} />
 <div id="snowflake-wrapper">
 	{#each snowflakes as sf}
 		{#if sf.visible}
@@ -141,11 +144,12 @@
 
 	.snowflake {
 		position: absolute;
-		z-index: 1000;
+		z-index: 100;
 		overflow: hidden;
 		height: var(--snowflake-height);
 		writing-mode: vertical-rl;
 		text-align: end;
 		line-height: 1.1em;
+		@apply font-sans;
 	}
 </style>
