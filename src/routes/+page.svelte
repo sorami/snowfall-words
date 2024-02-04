@@ -4,24 +4,40 @@
 
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { backInOut } from 'svelte/easing';
-	import { rangeRandom } from '$lib/utils';
+	import { lerp, rangeRandom } from '$lib/utils';
+	import { inTransition } from '$lib/transitions';
 	import Controller from './controller.svelte';
-	import {
-		N_SNOWFLAKES,
-		SNOWFLAKE_HEIGHT_EM,
-		randomInDelay,
-		randomInDuration,
-		randomOutDuration,
-		interpolateFontSize
-	} from '$lib/params';
 
-	let isControllerVisible = false;
+	let isControllerVisible = true;
 
 	import { sentences } from '$lib/data';
 	let clauses = sentences.flat();
 
-	// Snowflake data - create all at the beginning
+	let params = {
+		nSnowflakes: 20,
+		in: {
+			maxDelay: 5000,
+			minDuration: 5000,
+			maxDuration: 20000
+		},
+		out: {
+			minDuration: 500,
+			maxDuration: 3000
+		},
+		font: {
+			min: 9,
+			max: 36,
+			noise: 3
+		},
+		css: {
+			snowflakeHeight: {
+				name: '--snowflake-height',
+				value: 12,
+				unit: 'em'
+			}
+		}
+	};
+
 	type Snowflake = {
 		visible: boolean;
 		xCoord: number; // [0, 1]
@@ -30,10 +46,20 @@
 		fontSize: number;
 		easingParams: Record<string, number>;
 	};
+
+	// Font size relative to the "fall duration", to give the impression of "depth"
+	function interpolateFontSize(inDuration: number) {
+		const t =
+			(inDuration - params.in.minDuration) / (params.in.maxDuration - params.in.minDuration);
+		const value = lerp(params.font.max, params.font.min, t);
+		const fontSize = value + rangeRandom(-params.font.noise, params.font.noise);
+		return fontSize;
+	}
+
 	function createSnowflake(): Snowflake {
 		const text = clauses[Math.floor(Math.random() * clauses.length)]; // TODO: use `sentence`
 		const xCoord = Math.random();
-		const inDuration = randomInDuration();
+		const inDuration = rangeRandom(params.in.minDuration, params.in.maxDuration);
 		const fontSize = interpolateFontSize(inDuration);
 
 		// TODO: to `params.ts`
@@ -50,50 +76,13 @@
 			easingParams
 		};
 	}
-	let snowflakes: Snowflake[] = Array.from({ length: N_SNOWFLAKES }, createSnowflake).sort(
-		// Sort by "fall duration", so the faster (and bigger) ones are on top
-		(a, b) => b.inDuration - a.inDuration
-	);
 
-	function inTransition(
-		_node: HTMLElement,
-		{
-			xCoord,
-			inDuration,
-			fontSize,
-			easingParams
-		}: {
-			xCoord: number;
-			inDuration: number;
-			fontSize: number;
-			easingParams: Record<string, number>;
-		}
-	) {
-		// Random everytime, so the looped transitions don't look the same
-		const delay = randomInDelay();
-
-		return {
-			delay,
-			duration: inDuration,
-			css: (t: number) => {
-				const xt = backInOut(1 - t) / easingParams.x;
-				const deg = (1 - t) * easingParams.deg;
-
-				return `
-					left: ${(xCoord + xt) * 100}%;
-					font-size: ${fontSize}px;
-					bottom: ${100 - t * 100}%;
-					transform: rotate(${deg}deg);
-		        `;
-			}
-		};
-	}
-
-	// TODO: OUT transition
-
-	onMount(async () => {
-		// CSS custom properties
-		document.documentElement.style.setProperty('--snowflake-height', `${SNOWFLAKE_HEIGHT_EM}em`);
+	let snowflakes: Snowflake[] = [];
+	function initSnowflakes() {
+		snowflakes = Array.from({ length: params.nSnowflakes }, createSnowflake).sort(
+			// Sort by "fall duration", so the faster (and bigger) ones are on top
+			(a, b) => b.inDuration - a.inDuration
+		);
 
 		// start everything on mount. starting means setting the snowflakes visible.
 		// this "hack" is not needed when you configure your svelte to display transitions on first render:
@@ -101,6 +90,27 @@
 		setTimeout(() => {
 			snowflakes = snowflakes.map((sf) => ({ ...sf, visible: true }));
 		}, 50);
+	}
+
+	function updateCustomCssProperties() {
+		if (!mounted) return;
+		for (const item of Object.values(params.css)) {
+			document.documentElement.style.setProperty(item.name, `${item.value}${item.unit}`);
+		}
+	}
+
+	// Update when params change
+	$: {
+		params;
+		updateCustomCssProperties();
+		initSnowflakes();
+	}
+
+	let mounted = false;
+	onMount(async () => {
+		updateCustomCssProperties();
+		initSnowflakes();
+		mounted = true;
 	});
 </script>
 
@@ -108,7 +118,8 @@
 	<title>おもいでふりつもる - ななめせんなめせん</title>
 </svelte:head>
 
-<Controller bind:isVisible={isControllerVisible} />
+<Controller bind:isVisible={isControllerVisible} bind:params />
+
 <div id="snowflake-wrapper">
 	{#each snowflakes as sf}
 		{#if sf.visible}
@@ -117,12 +128,16 @@
 				style="left: {sf.xCoord * 100}%; bottom: 0; font-size: {sf.fontSize}px;"
 				in:inTransition={{
 					xCoord: sf.xCoord,
+					maxDelay: params.in.maxDelay,
 					inDuration: sf.inDuration,
 					fontSize: sf.fontSize,
 					easingParams: sf.easingParams
 				}}
 				on:introend={() => (sf.visible = false)}
-				out:fade={{ delay: 0, duration: randomOutDuration() }}
+				out:fade={{
+					delay: 0,
+					duration: rangeRandom(params.out.minDuration, params.out.maxDuration)
+				}}
 				on:outroend={() => (sf.visible = true)}
 			>
 				{sf.text}
