@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Slider from './Slider.svelte';
+
 	export let isVisible: boolean;
 	export let params: any;
 </script>
@@ -6,38 +8,41 @@
 <div class="fixed top-3 left-3 z-999">
 	{#if isVisible}
 		<div id="controller" class="flex flex-col gap-3">
-			<h2 class="font-bold">Parameters</h2>
-			<div class="text-xs">
-				<div class="flex gap-3">
-					<label for="n-snowflakes">雪片数</label>
-					<input
-						type="range"
-						id="n-snowflakes"
-						name="n-snowflakes"
-						bind:value={params.nSnowflakes}
-						min="1"
-						max="100"
-					/>
-					<div class="w-4">
-						{params.nSnowflakes}
-					</div>
-				</div>
-			</div>
+			<h2 class="text-center font-bold text-sm">パラメーター</h2>
 
-			<div class="text-xs">
-				<div class="flex gap-3">
-					<label for="snowflake-height">雪片高さ</label>
-					<input
-						type="range"
-						id="snowflake-height"
-						name="snowflake-height"
-						bind:value={params.css.snowflakeHeight.value}
-						min="5"
-						max="20"
-					/>
-					<div class="w-4">
-						{params.css.snowflakeHeight.value}
-					</div>
+			<div class="flex flex-col gap-3">
+				<Slider label="雪片数" bind:value={params.nSnowflakes} min={1} max={100} />
+
+				<Slider label="雪片高" bind:value={params.css.snowflakeHeight.value} min={5} max={30} />
+
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">フォントサイズ</h3>
+					<Slider label="min" bind:value={params.font.min} min={10} max={128} />
+					<Slider label="max" bind:value={params.font.max} min={10} max={128} />
+					<Slider label="ゆらぎ" bind:value={params.font.noise} min={0} max={12} />
+				</div>
+
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">水平の動き</h3>
+					<Slider label="min" bind:value={params.easing.x.min} min={1} max={60} />
+					<Slider label="max" bind:value={params.easing.x.max} min={1} max={60} />
+				</div>
+
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">回転の動き</h3>
+					<Slider label="deg" bind:value={params.easing.deg} min={0} max={90} />
+				</div>
+
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">降る時間</h3>
+					<Slider label="min" bind:value={params.in.minDuration} min={500} max={50000} />
+					<Slider label="max" bind:value={params.in.maxDuration} min={500} max={50000} />
+				</div>
+
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">溶ける時間</h3>
+					<Slider label="min" bind:value={params.out.minDuration} min={500} max={10000} />
+					<Slider label="max" bind:value={params.out.maxDuration} min={500} max={10000} />
 				</div>
 			</div>
 

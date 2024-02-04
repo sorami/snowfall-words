@@ -6,7 +6,7 @@
 	import { fade } from 'svelte/transition';
 	import { lerp, rangeRandom } from '$lib/utils';
 	import { inTransition } from '$lib/transitions';
-	import Controller from './controller.svelte';
+	import Controller from './Controller.svelte';
 
 	let isControllerVisible = true;
 
@@ -35,6 +35,13 @@
 				value: 12,
 				unit: 'em'
 			}
+		},
+		easing: {
+			x: {
+				min: 10,
+				max: 30
+			},
+			deg: 20
 		}
 	};
 
@@ -55,17 +62,19 @@
 		const fontSize = value + rangeRandom(-params.font.noise, params.font.noise);
 		return fontSize;
 	}
-
+	// Create a snowflake with settings
 	function createSnowflake(): Snowflake {
 		const text = clauses[Math.floor(Math.random() * clauses.length)]; // TODO: use `sentence`
 		const xCoord = Math.random();
 		const inDuration = rangeRandom(params.in.minDuration, params.in.maxDuration);
 		const fontSize = interpolateFontSize(inDuration);
 
-		// TODO: to `params.ts`
 		const easingParams = {
-			x: Math.random() > 0.5 ? rangeRandom(10, 30) : rangeRandom(-30, -10),
-			deg: rangeRandom(-20, 20)
+			x:
+				Math.random() > 0.5
+					? rangeRandom(params.easing.x.min, params.easing.x.max)
+					: rangeRandom(-params.easing.x.max, -params.easing.x.min),
+			deg: rangeRandom(-params.easing.deg, params.easing.deg)
 		};
 		return {
 			visible: false,
