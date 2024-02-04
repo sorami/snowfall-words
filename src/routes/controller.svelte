@@ -24,8 +24,8 @@
 
 				<div class=" flex flex-col gap-1">
 					<h3 class="font-bold text-xs">水平の動き</h3>
-					<Slider label="min" bind:value={params.easing.x.min} min={1} max={60} />
-					<Slider label="max" bind:value={params.easing.x.max} min={1} max={60} />
+					<Slider label="min" bind:value={params.easing.x.min} min={3} max={30} />
+					<Slider label="max" bind:value={params.easing.x.max} min={3} max={30} />
 				</div>
 
 				<div class=" flex flex-col gap-1">
