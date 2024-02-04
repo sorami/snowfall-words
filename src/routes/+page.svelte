@@ -14,12 +14,12 @@
 		nSentences: 50,
 		inDelayClauseInterval: {
 			min: 1500,
-			max: 3500
+			max: 3000
 		},
 		in: {
 			minDuration: 5000,
 			maxDuration: 20000,
-			inDelayOffsetMax: 180000
+			inDelayOffsetMax: 120000
 		},
 		out: {
 			minDuration: 2000,
@@ -28,7 +28,7 @@
 			maxOutroendDelay: 120000
 		},
 		font: {
-			min: 8,
+			min: 9,
 			max: 40,
 			noise: 0
 		},

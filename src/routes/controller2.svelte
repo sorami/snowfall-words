@@ -53,7 +53,7 @@
 
 				<div class=" flex flex-col gap-1">
 					<h3 class="font-bold text-xs">最初に登場するまでの遅延時間</h3>
-					<Slider label="max" bind:value={params.in.inDelayOffsetMax} min={60000} max={360000} />
+					<Slider label="max" bind:value={params.in.inDelayOffsetMax} min={60000} max={480000} />
 				</div>
 				<div class=" flex flex-col gap-1">
 					<h3 class="font-bold text-xs">再び登場するまでの遅延時間</h3>
