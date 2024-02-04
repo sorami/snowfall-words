@@ -3,27 +3,29 @@
 	import 'virtual:uno.css';
 
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import { lerp, rangeRandom } from '$lib/utils';
-	import { inTransition } from '$lib/transitions';
+	import { inTransition, outTransition } from '$lib/transitions';
 	import Controller from './Controller.svelte';
 	import { sentences } from '$lib/data';
 
 	let isControllerVisible = true;
 
 	let params = {
-		nSentences: 10,
+		nSentences: 50,
 		inDelayClauseInterval: {
 			min: 2500,
 			max: 3500
 		},
 		in: {
 			minDuration: 5000,
-			maxDuration: 20000
+			maxDuration: 20000,
+			inDelayOffsetMax: 30000
 		},
 		out: {
 			minDuration: 500,
-			maxDuration: 3000
+			maxDuration: 3000,
+			minOutroendDelay: 100000,
+			maxOutroendDelay: 200000
 		},
 		font: {
 			min: 9,
@@ -52,6 +54,7 @@
 		text: string;
 		inDelay: number;
 		inDuration: number;
+		outroendDelay: number;
 		fontSize: number;
 		easingParams: Record<string, number>;
 	};
@@ -70,6 +73,7 @@
 		// same parameters for all clauses
 		const xCoord = Math.random();
 		const inDuration = rangeRandom(params.in.minDuration, params.in.maxDuration);
+		const outroendDelay = rangeRandom(params.out.minOutroendDelay, params.out.maxOutroendDelay);
 		const fontSize = interpolateFontSize(inDuration);
 		const easingParams = {
 			x:
@@ -86,13 +90,15 @@
 			params.inDelayClauseInterval.max,
 			tFontSize
 		);
+		const inDelayOffset = rangeRandom(0, params.in.inDelayOffsetMax);
 
 		const sentSnowflakes = sent.map((text, i) => ({
 			visible: false,
-			inDelay: i * inDelayClauseInterval, // each clause falls after interval
+			inDelay: inDelayOffset + i * inDelayClauseInterval, // each clause falls after interval
 			text,
 			xCoord,
 			inDuration,
+			outroendDelay,
 			fontSize,
 			easingParams
 		}));
@@ -109,7 +115,6 @@
 		randomSentences = randomSentences.slice(0, params.nSentences);
 
 		snowflakes = randomSentences
-			.slice(0, 3)
 			.map(createSentenceSnowflake)
 			.flat()
 			.sort(
@@ -167,11 +172,15 @@
 					easingParams: sf.easingParams
 				}}
 				on:introend={() => (sf.visible = false)}
-				out:fade={{
-					delay: 0,
-					duration: rangeRandom(params.out.minDuration, params.out.maxDuration)
+				out:outTransition={{
+					outDuration: rangeRandom(params.out.minDuration, params.out.maxDuration)
 				}}
-				on:outroend={() => (sf.visible = true)}
+				on:outroend={() => {
+					// pause for a while before reappearing
+					setTimeout(() => {
+						sf.visible = true;
+					}, sf.outroendDelay);
+				}}
 			>
 				{sf.text}
 			</div>

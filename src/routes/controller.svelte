@@ -34,6 +34,12 @@
 				</div>
 
 				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">文節間隔</h3>
+					<Slider label="min" bind:value={params.inDelayClauseInterval.min} min={500} max={4000} />
+					<Slider label="max" bind:value={params.inDelayClauseInterval.max} min={500} max={4000} />
+				</div>
+
+				<div class=" flex flex-col gap-1">
 					<h3 class="font-bold text-xs">降る時間</h3>
 					<Slider label="min" bind:value={params.in.minDuration} min={500} max={50000} />
 					<Slider label="max" bind:value={params.in.maxDuration} min={500} max={50000} />
@@ -46,9 +52,13 @@
 				</div>
 
 				<div class=" flex flex-col gap-1">
-					<h3 class="font-bold text-xs">文節間隔</h3>
-					<Slider label="min" bind:value={params.inDelayClauseInterval.min} min={500} max={4000} />
-					<Slider label="max" bind:value={params.inDelayClauseInterval.max} min={500} max={4000} />
+					<h3 class="font-bold text-xs">最初に登場するまでの遅延</h3>
+					<Slider label="min" bind:value={params.in.inDelayOffsetMax} min={3000} max={50000} />
+				</div>
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">再び登場するまでの遅延</h3>
+					<Slider label="min" bind:value={params.out.minOutroendDelay} min={10000} max={500000} />
+					<Slider label="max" bind:value={params.out.maxOutroendDelay} min={10000} max={500000} />
 				</div>
 			</div>
 

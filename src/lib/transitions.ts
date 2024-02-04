@@ -1,5 +1,4 @@
 import { backInOut } from 'svelte/easing';
-import { rangeRandom } from '$lib/utils';
 
 function inTransition(
 	_node: HTMLElement,
@@ -29,11 +28,24 @@ function inTransition(
 					font-size: ${fontSize}px;
 					bottom: ${100 - t * 100}%;
 					transform: rotate(${deg}deg);
+					${t === 0 ? 'opacity: 0;' : 'opacity: 1;'}
 		        `;
 		}
 	};
 }
 
-// TODO: OUT transition
+function outTransition(_node: HTMLElement, { outDuration }: { outDuration: number }) {
+	const o = +getComputedStyle(_node).opacity;
 
-export { inTransition };
+	return {
+		delay: 0,
+		duration: outDuration,
+		css: (t: number) => {
+			return `
+				opacity: ${o * t};
+			`;
+		}
+	};
+}
+
+export { inTransition, outTransition };
