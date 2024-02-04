@@ -207,7 +207,11 @@
 		writing-mode: vertical-rl;
 		text-align: end;
 		line-height: 1.1em;
-		text-shadow: 0px 0px 10px rgba(0, 0, 64, 0.3);
+		text-shadow:
+			3px 3px 0 #fff,
+			-3px 3px 0 #fff,
+			-3px -3px 0 #fff,
+			3px -3px 0 #fff;
 		@apply font-bold;
 		@apply font-sans;
 	}
