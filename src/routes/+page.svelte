@@ -4,7 +4,7 @@
 
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { bounceInOut, backInOut } from 'svelte/easing';
+	import { backInOut } from 'svelte/easing';
 	import { rangeRandom } from '$lib/utils';
 
 	import {
@@ -133,7 +133,6 @@
 		min-height: 100%;
 		@apply bg-white;
 		@apply text-black;
-		writing-mode: vertical-rl;
 	}
 
 	:global(html) {
@@ -145,6 +144,8 @@
 		z-index: 1000;
 		overflow: hidden;
 		height: var(--snowflake-height);
+		writing-mode: vertical-rl;
 		text-align: end;
+		line-height: 1.1em;
 	}
 </style>
