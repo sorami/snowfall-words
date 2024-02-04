@@ -5,23 +5,20 @@ function inTransition(
 	_node: HTMLElement,
 	{
 		xCoord,
-		maxDelay,
+		inDelay,
 		inDuration,
 		fontSize,
 		easingParams
 	}: {
 		xCoord: number;
-		maxDelay: number;
+		inDelay: number;
 		inDuration: number;
 		fontSize: number;
 		easingParams: Record<string, number>;
 	}
 ) {
-	// Random everytime, so the looped transitions don't look the same
-	const delay = rangeRandom(0, maxDelay);
-
 	return {
-		delay,
+		delay: inDelay,
 		duration: inDuration,
 		css: (t: number) => {
 			const xt = backInOut(1 - t) / easingParams.x;

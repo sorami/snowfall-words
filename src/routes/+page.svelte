@@ -7,16 +7,17 @@
 	import { lerp, rangeRandom } from '$lib/utils';
 	import { inTransition } from '$lib/transitions';
 	import Controller from './Controller.svelte';
+	import { sentences } from '$lib/data';
 
 	let isControllerVisible = true;
 
-	import { sentences } from '$lib/data';
-	let clauses = sentences.flat();
-
 	let params = {
-		nSnowflakes: 20,
+		nSentences: 10,
+		inDelayClauseInterval: {
+			min: 2500,
+			max: 3500
+		},
 		in: {
-			maxDelay: 5000,
 			minDuration: 5000,
 			maxDuration: 20000
 		},
@@ -32,14 +33,14 @@
 		css: {
 			snowflakeHeight: {
 				name: '--snowflake-height',
-				value: 12,
+				value: 9,
 				unit: 'em'
 			}
 		},
 		easing: {
 			x: {
-				min: 10,
-				max: 30
+				min: 25,
+				max: 50
 			},
 			deg: 20
 		}
@@ -49,6 +50,7 @@
 		visible: boolean;
 		xCoord: number; // [0, 1]
 		text: string;
+		inDelay: number;
 		inDuration: number;
 		fontSize: number;
 		easingParams: Record<string, number>;
@@ -62,13 +64,13 @@
 		const fontSize = value + rangeRandom(-params.font.noise, params.font.noise);
 		return fontSize;
 	}
+
 	// Create a snowflake with settings
-	function createSnowflake(): Snowflake {
-		const text = clauses[Math.floor(Math.random() * clauses.length)]; // TODO: use `sentence`
+	function createSentenceSnowflake(sent: string[]): Snowflake[] {
+		// same parameters for all clauses
 		const xCoord = Math.random();
 		const inDuration = rangeRandom(params.in.minDuration, params.in.maxDuration);
 		const fontSize = interpolateFontSize(inDuration);
-
 		const easingParams = {
 			x:
 				Math.random() > 0.5
@@ -76,22 +78,44 @@
 					: rangeRandom(-params.easing.x.max, -params.easing.x.min),
 			deg: rangeRandom(-params.easing.deg, params.easing.deg)
 		};
-		return {
+
+		// adjust interval according to font size
+		let tFontSize = (fontSize - params.font.min) / (params.font.max - params.font.min);
+		let inDelayClauseInterval = lerp(
+			params.inDelayClauseInterval.min,
+			params.inDelayClauseInterval.max,
+			tFontSize
+		);
+
+		const sentSnowflakes = sent.map((text, i) => ({
 			visible: false,
+			inDelay: i * inDelayClauseInterval, // each clause falls after interval
 			text,
 			xCoord,
 			inDuration,
 			fontSize,
 			easingParams
-		};
+		}));
+		return sentSnowflakes;
 	}
 
 	let snowflakes: Snowflake[] = [];
 	function initSnowflakes() {
-		snowflakes = Array.from({ length: params.nSnowflakes }, createSnowflake).sort(
-			// Sort by "fall duration", so the faster (and bigger) ones are on top
-			(a, b) => b.inDuration - a.inDuration
-		);
+		const shuffledSentences = sentences.sort(() => Math.random() - 0.5);
+		let randomSentences = [...shuffledSentences];
+		while (randomSentences.length < params.nSentences) {
+			randomSentences = [...randomSentences, ...shuffledSentences];
+		}
+		randomSentences = randomSentences.slice(0, params.nSentences);
+
+		snowflakes = randomSentences
+			.slice(0, 3)
+			.map(createSentenceSnowflake)
+			.flat()
+			.sort(
+				// Sort by "fall duration", so the faster (and bigger) ones are on top
+				(a, b) => b.inDuration - a.inDuration
+			);
 
 		// start everything on mount. starting means setting the snowflakes visible.
 		// this "hack" is not needed when you configure your svelte to display transitions on first render:
@@ -137,7 +161,7 @@
 				style="left: {sf.xCoord * 100}%; bottom: 0; font-size: {sf.fontSize}px;"
 				in:inTransition={{
 					xCoord: sf.xCoord,
-					maxDelay: params.in.maxDelay,
+					inDelay: sf.inDelay,
 					inDuration: sf.inDuration,
 					fontSize: sf.fontSize,
 					easingParams: sf.easingParams

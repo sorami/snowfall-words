@@ -11,9 +11,9 @@
 			<h2 class="text-center font-bold text-sm">パラメーター</h2>
 
 			<div class="flex flex-col gap-3">
-				<Slider label="雪片数" bind:value={params.nSnowflakes} min={1} max={100} />
+				<Slider label="文数" bind:value={params.nSentences} min={1} max={100} />
 
-				<Slider label="雪片高" bind:value={params.css.snowflakeHeight.value} min={5} max={30} />
+				<Slider label="1行文字数" bind:value={params.css.snowflakeHeight.value} min={5} max={30} />
 
 				<div class=" flex flex-col gap-1">
 					<h3 class="font-bold text-xs">フォントサイズ</h3>
@@ -30,7 +30,7 @@
 
 				<div class=" flex flex-col gap-1">
 					<h3 class="font-bold text-xs">回転の動き</h3>
-					<Slider label="deg" bind:value={params.easing.deg} min={0} max={90} />
+					<Slider label="deg" bind:value={params.easing.deg} min={0} max={180} />
 				</div>
 
 				<div class=" flex flex-col gap-1">
@@ -43,6 +43,12 @@
 					<h3 class="font-bold text-xs">溶ける時間</h3>
 					<Slider label="min" bind:value={params.out.minDuration} min={500} max={10000} />
 					<Slider label="max" bind:value={params.out.maxDuration} min={500} max={10000} />
+				</div>
+
+				<div class=" flex flex-col gap-1">
+					<h3 class="font-bold text-xs">文節間隔</h3>
+					<Slider label="min" bind:value={params.inDelayClauseInterval.min} min={500} max={4000} />
+					<Slider label="max" bind:value={params.inDelayClauseInterval.max} min={500} max={4000} />
 				</div>
 			</div>
 
