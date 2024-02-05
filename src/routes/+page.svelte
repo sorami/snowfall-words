@@ -13,12 +13,12 @@
 	let params = {
 		nSentences: 50,
 		inDelayClauseInterval: {
-			min: 1500,
-			max: 3000
+			min: 5000,
+			max: 10000
 		},
 		in: {
-			minDuration: 5000,
-			maxDuration: 20000,
+			minDuration: 10000,
+			maxDuration: 30000,
 			inDelayOffsetMax: 120000
 		},
 		out: {
@@ -28,8 +28,8 @@
 			maxOutroendDelay: 120000
 		},
 		font: {
-			min: 9,
-			max: 40,
+			min: 12,
+			max: 48,
 			noise: 0
 		},
 		css: {
@@ -213,6 +213,6 @@
 			-3px -3px 0 #fff,
 			3px -3px 0 #fff;
 		@apply font-bold;
-		@apply font-sans;
+		@apply font-serif;
 	}
 </style>

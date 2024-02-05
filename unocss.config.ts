@@ -7,7 +7,7 @@ export default defineConfig({
 	presets: [
 		presetUno(),
 		presetWebFonts({
-			fonts: { sans: 'Zen Maru Gothic' }
+			fonts: { sans: 'Zen Maru Gothic', serif: 'Noto Serif Japanese' }
 		}),
 		presetIcons()
 	],
