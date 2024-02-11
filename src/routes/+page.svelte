@@ -41,10 +41,10 @@
 		},
 		easing: {
 			x: {
-				min: 10,
-				max: 50
+				min: 5,
+				max: 30
 			},
-			deg: 30
+			deg: 45
 		}
 	};
 
