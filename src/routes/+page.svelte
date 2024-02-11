@@ -8,34 +8,34 @@
 	import Controller from './Controller.svelte';
 	import { sentences } from '$lib/data';
 
-	let isControllerVisible = true;
+	let isControllerVisible = false;
 
 	let params = {
 		nSentences: 50,
 		inDelayClauseInterval: {
-			min: 5000,
-			max: 10000
+			min: 3000,
+			max: 4000
 		},
 		in: {
 			minDuration: 10000,
 			maxDuration: 30000,
-			inDelayOffsetMax: 120000
+			inDelayOffsetMax: 240000
 		},
 		out: {
 			minDuration: 2000,
 			maxDuration: 6000,
 			minOutroendDelay: 60000,
-			maxOutroendDelay: 120000
+			maxOutroendDelay: 180000
 		},
 		font: {
-			min: 12,
+			min: 18,
 			max: 48,
 			noise: 0
 		},
 		css: {
 			snowflakeHeight: {
 				name: '--snowflake-height',
-				value: 8,
+				value: 6,
 				unit: 'em'
 			}
 		},
