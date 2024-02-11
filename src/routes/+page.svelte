@@ -13,19 +13,19 @@
 	let params = {
 		nSentences: 50,
 		inDelayClauseInterval: {
-			min: 3000,
-			max: 4000
+			min: 4000,
+			max: 7000
 		},
 		in: {
 			minDuration: 10000,
 			maxDuration: 30000,
-			inDelayOffsetMax: 240000
+			inDelayOffsetMax: 360000
 		},
 		out: {
 			minDuration: 2000,
 			maxDuration: 6000,
 			minOutroendDelay: 60000,
-			maxOutroendDelay: 180000
+			maxOutroendDelay: 120000
 		},
 		font: {
 			min: 18,
